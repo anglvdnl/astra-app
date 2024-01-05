@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import pb from "@/lib/pocketbase";
-import { getNextjsCookie } from "@/utils/server-cookies";
+import { getNextjsCookie } from "@/lib/utils";
 import PocketBase from "pocketbase";
+import { pb_url } from "@/consts/consts";
 
 export async function middleware(request: NextRequest) {
     const response = NextResponse.next();
     const request_cookie = request.cookies.get("pb_auth")
     const cookie = await getNextjsCookie(request_cookie)
+    const pb = new PocketBase(pb_url);
     if (cookie) {
         try {
             pb.authStore.loadFromCookie(cookie)
@@ -64,5 +66,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/", "/auth/:path*"],
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

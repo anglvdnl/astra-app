@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import pb from "@/lib/pocketbase";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -28,7 +28,6 @@ function Auth() {
             const user = await pb.collection("users").authWithPassword(formData.email, formData.password)
             document.cookie = pb.authStore.exportToCookie({httpOnly: false});
             if (search_params) {
-                //  redirect to the page tey were going to before
                 router.push(search_params);
             } else {
                 router.push("/");
@@ -40,7 +39,8 @@ function Auth() {
         }
     }
     return (
-        <div className="ml-[80px] p-5 flex justify-center">
+        <div className="p-5 flex flex-col justify-center items-center h-[100%]">
+            <h2 className="text-5xl mb-5">Login</h2>
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2">
                 <input
                     type="email"
@@ -48,6 +48,7 @@ function Auth() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    placeholder={"Email"}
                 />
                 <input
                     type="password"
@@ -55,6 +56,7 @@ function Auth() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
+                    placeholder={"Password"}
                 />
                 <button type="submit">Submit</button>
             </form>
