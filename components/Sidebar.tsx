@@ -14,47 +14,27 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import pb from "@/lib/pocketbase";
+import { getDoc } from 'firebase/firestore';
+import {doc} from "@firebase/firestore";
+import {db} from "@/services/firebase";
 
 function Sidebar() {
     const matches = useHideByRoute(["/auth"])
-    const [groups, setGroups] = useState<string[]>([])
+    const [groups, setGroups] = useState<object[]>([])
     const [groupName, setGroupName] = useState("")
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await pb.collection("groups").getList();
-                const newArr:string[] = []
-                for (let dataKey of data.items) {
-                    newArr.push(dataKey.field)
-                }
-                setGroups(newArr)
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
+        const docRef = doc(db, "users", "uzQ3tLVHjQR9vGkZQdqEioBCSHV2");
+        const data = getDoc(docRef);
+        data.then(r => setGroups(r.data().groups))
     }, []);
-
-    const createGroup = async () => {
-        const groupExists = groups.some(group => group === groupName)
-        if (!groupExists) {
-            await pb.collection("groups").create({"field": groupName})
-            setGroups([...groups, groupName])
-            setGroupName("")
-        } else {
-
-        }
-    };
-
+    
     return (
         <aside
             className={`absolute bg-black h-[calc(100vh-52px)] w-[80px] flex justify-start items-center gap-2 flex-col ${matches && "hidden"}`}>
             {groups.map((groupName, index) => (
-                <Link key={index} href={groupName.replace(/\s+/g, '').toLowerCase()}>
-                    {groupName}
+                <Link key={index} href={groupName.name}>
+                    {groupName.name}
                 </Link>
             ))}
             <Dialog>
@@ -70,7 +50,7 @@ function Sidebar() {
                     </div>
                     <DialogFooter>
                         <DialogClose>
-                            <Button onClick={createGroup} type="submit">Save changes</Button>
+                            <Button type="submit">Save changes</Button>
                         </DialogClose>
                     </DialogFooter>
                 </DialogContent>

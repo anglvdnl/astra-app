@@ -1,4 +1,3 @@
-import pb from "@/lib/pocketbase";
 
 export default function Home() {
     return (

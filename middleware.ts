@@ -1,68 +1,50 @@
-import { NextRequest, NextResponse } from "next/server";
-import pb from "@/lib/pocketbase";
-import { getNextjsCookie } from "@/lib/utils";
-import PocketBase from "pocketbase";
-import { pb_url } from "@/consts/consts";
+import {NextRequest, NextResponse} from "next/server";
+import {jwtVerify} from 'jose'
 
 export async function middleware(request: NextRequest) {
     const response = NextResponse.next();
-    const request_cookie = request.cookies.get("pb_auth")
-    const cookie = await getNextjsCookie(request_cookie)
-    const pb = new PocketBase(pb_url);
+    const cookie = request.cookies.get("jwt-auth")
+    let isExpired = false;
+
     if (cookie) {
+        const secretKeyUint8Array = new TextEncoder().encode(process.env.secretKey);
         try {
-            pb.authStore.loadFromCookie(cookie)
+            const value = await jwtVerify(cookie.value, secretKeyUint8Array);
+            isExpired = false;
+            response.headers.set('x-user-uid', <string>value.payload.name)
         } catch (error) {
-            pb.authStore.clear();
-            response.headers.set(
-                "set-cookie",
-                pb.authStore.exportToCookie({ httpOnly: false })
-            );
+            console.log(error);
+            isExpired = true;
         }
+    } else {
+        isExpired = true;
     }
 
-    try {
-        // get an up-to-date auth store state by verifying and refreshing the loaded auth model (if any)
-        pb.authStore.isValid &&
-        (await pb.collection("users").authRefresh());
-    } catch (err) {
-        // clear the auth store on failed refresh
-        pb.authStore.clear();
-        response.headers.set(
-            "set-cookie",
-            pb.authStore.exportToCookie({ httpOnly: false })
-        );
-    }
-
-    if (!pb.authStore.model && !request.nextUrl.pathname.startsWith("/auth")) {
-        const redirect_to = new URL("/auth", request.url);
-        if (request.nextUrl.pathname){
-            redirect_to.search = new URLSearchParams({
+    if (isExpired && !request.nextUrl.pathname.startsWith("/auth")) {
+        const redirect = new URL("/auth", request.url);
+        if (request.nextUrl.pathname) {
+            redirect.search = new URLSearchParams({
                 next: request.nextUrl.pathname,
             }).toString();
-        }else{
-            redirect_to.search = new URLSearchParams({
-                next:'/',
+        } else {
+            redirect.search = new URLSearchParams({
+                next: '/',
             }).toString();
         }
-
-
-        return NextResponse.redirect(redirect_to);
+        return NextResponse.redirect(redirect);
     }
 
-
-    if (pb.authStore.model && request.nextUrl.pathname.startsWith("/auth")) {
-        const next_url = request.headers.get("next-url") as string
-        if(next_url){
-            const redirect_to = new URL(next_url, request.url);
-            return NextResponse.redirect(redirect_to);
+    if (!isExpired && request.nextUrl.pathname.startsWith("/auth")) {
+        const nextUrl = request.headers.get("next-url") as string
+        if (nextUrl) {
+            const redirect = new URL(nextUrl, request.url);
+            return NextResponse.redirect(redirect);
         }
-        const redirect_to = new URL(`/`,request.url);
-        return NextResponse.redirect(redirect_to);
-
+        const redirect = new URL(`/`, request.url);
+        return NextResponse.redirect(redirect);
     }
 
-    return response;
+    return response
 }
 
 export const config = {

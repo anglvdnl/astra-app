@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import {CookiesProvider} from "next-client-cookies/server";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,12 +18,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+      <CookiesProvider>
+          <html lang="en">
+          <body className={inter.className}>
           <Header/>
           <Sidebar/>
           {children}
-      </body>
-    </html>
+          </body>
+          </html>
+      </CookiesProvider>
   )
 }
