@@ -6,6 +6,7 @@ import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {doc, setDoc} from "@firebase/firestore";
 import {defaultData} from "@/consts/defaultData";
+import {expiredIn1Day} from "@/consts/expired";
 
 interface AuthFunctions {
     logout: () => void;
@@ -24,7 +25,7 @@ function useAuth(): AuthFunctions {
             const response = await signInWithEmailAndPassword(auth, formData.email, formData.password);
             const jwt = await generateToken(response.user.uid);
             cookies.set("jwt-auth", jwt, {
-                expires: 60 * 60 * 60
+                expires: expiredIn1Day
             });
             router.push("/");
         } catch (error: any) {
@@ -49,7 +50,7 @@ function useAuth(): AuthFunctions {
             await setDoc(doc(db, "users", response.user.uid), defaultData);
             const jwt = await generateToken(response.user.uid);
             cookies.set("jwt-auth", jwt, {
-                expires: 60 * 60 * 60
+                expires: expiredIn1Day
             });
             router.push("/");
         } catch (error: any) {

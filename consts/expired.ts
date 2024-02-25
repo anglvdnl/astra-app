@@ -1,0 +1,1 @@
+export const expiredIn1Day = 60 * 60 * 60
