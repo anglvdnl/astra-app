@@ -1,9 +1,11 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import type {Metadata} from 'next'
+import {Inter} from 'next/font/google'
 import './globals.css'
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import {CookiesProvider} from "next-client-cookies/server";
+import Providers from "@/app/providers";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,9 +23,13 @@ export default function RootLayout({
       <CookiesProvider>
           <html lang="en">
           <body className={inter.className}>
-          <Header/>
-          <Sidebar/>
-          {children}
+          <Providers>
+              <ConditionalLayout>
+                  <Header/>
+                  <Sidebar/>
+              </ConditionalLayout>
+              {children}
+          </Providers>
           </body>
           </html>
       </CookiesProvider>

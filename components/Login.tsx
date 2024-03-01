@@ -1,21 +1,16 @@
 "use client"
 
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 
 function Login() {
-    const {signIn, error} = useAuth()
+    const {loginMutation} = useAuth()
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
-    const [signInError, setSignInError] = useState("")
-
-    useEffect(() => {
-        setSignInError(error)
-    }, [error]);
 
     const handleInputChange = (event: any) => {
         const {name, value} = event.target;
@@ -27,7 +22,7 @@ function Login() {
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
-        signIn(formData)
+        loginMutation.mutate({data: formData})
     }
 
     return (
@@ -50,8 +45,8 @@ function Login() {
                     onChange={handleInputChange}
                     placeholder={"Password"}
                 />
-                <p>{signInError}</p>
-                <Button type="submit">Submit</Button>
+                <p>{loginMutation.error?.response?.data?.error}</p>
+                <Button disabled={loginMutation.isPending} type="submit">Submit</Button>
             </form>
         </>
     );

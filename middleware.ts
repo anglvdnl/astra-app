@@ -1,24 +1,11 @@
 import {NextRequest, NextResponse} from "next/server";
-import {jwtVerify} from 'jose'
 
 export async function middleware(request: NextRequest) {
     const response = NextResponse.next();
-    const cookie = request.cookies.get("jwt-auth")
+    const cookie = request.cookies.get("auth")
     let isExpired = false;
 
-    if (cookie) {
-        const secretKeyUint8Array = new TextEncoder().encode(process.env.secretKey);
-        try {
-            const value = await jwtVerify(cookie.value, secretKeyUint8Array);
-            isExpired = false;
-            response.headers.set('x-user-uid', <string>value.payload.name)
-        } catch (error) {
-            console.log(error);
-            isExpired = true;
-        }
-    } else {
-        isExpired = true;
-    }
+    isExpired = !cookie;
 
     if (isExpired && !request.nextUrl.pathname.startsWith("/auth")) {
         const redirect = new URL("/auth", request.url);

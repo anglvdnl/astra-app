@@ -1,21 +1,16 @@
 "use client"
 
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 
 function Register() {
-    const {signUp, error} = useAuth()
+    const {registerMutation} = useAuth()
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
-    const [signUpError, setSignUpError] = useState("")
-
-    useEffect(() => {
-        setSignUpError(error)
-    }, [error]);
 
     const handleInputChange = (event: any) => {
         const {name, value} = event.target;
@@ -25,9 +20,9 @@ function Register() {
         });
     };
 
-    const handleSubmit = async (event: any) => {
+    const handleSubmit = (event: any) => {
         event.preventDefault();
-        signUp(formData);
+        registerMutation.mutate({data: formData})
     };
 
 
@@ -51,8 +46,8 @@ function Register() {
                     onChange={handleInputChange}
                     placeholder={"Password"}
                 />
-                <p>{signUpError}</p>
-                <Button type="submit">Submit</Button>
+                <p>{registerMutation.error?.response?.data?.error}</p>
+                <Button disabled={registerMutation.isPending} type="submit">Submit</Button>
             </form>
         </>
     );

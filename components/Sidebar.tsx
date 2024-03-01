@@ -1,8 +1,7 @@
 "use client"
 
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Link from "next/link";
-import useHideByRoute from "@/hooks/useHideByRoute";
 import {
     Dialog,
     DialogClose,
@@ -14,44 +13,51 @@ import {
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import useDB from "@/hooks/useDB";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import axiosInstance from "@/instances/axiosInstance";
+
+interface Group {
+    id: number;
+    name: string;
+    description: string;
+}
 
 function Sidebar() {
-    const {getDB, updateDB} = useDB()
-    const matches = useHideByRoute(["/auth"])
-    const [groups, setGroups] = useState<{ groupName: string, cards: string[] }[]>([])
     const [groupName, setGroupName] = useState("")
+    const queryClient = useQueryClient()
 
-    useEffect(() => {
-        getDB().then(response => {
-            const data = response.data()
-            if (data) {
-                setGroups(data.groups)
-            }
-        })
-    }, [getDB]);
-
-    function createNewGroup(){
-        if (groupName){
-            const updatedData = {
-                groups: [
-                    ...groups,
-                    {
-                        groupName,
-                        cards: []
-                    }
-                ]
-            }
-            updateDB(updatedData)
+    const {data} = useQuery<Group[]>({
+        queryKey: ["groups"],
+        queryFn: async () => {
+            const response = await axiosInstance.get("/groups")
+            return response.data as Group[]
         }
+    })
+
+    const {mutate} = useMutation({
+        mutationFn: async ({data}: { data: { name: string, description: string } }) => {
+            const response = await axiosInstance.post("/groups", data)
+            return response.data
+        },
+        onSuccess: (response) => {
+            console.log(response);
+            queryClient.invalidateQueries({queryKey: ['groups']})
+        },
+        onError: (error) => {
+            console.log(error);
+        }
+    })
+
+    function createNewGroup() {
+        mutate({data: {name: groupName, description: ""}})
     }
 
     return (
         <aside
-            className={`absolute bg-black h-[calc(100vh-52px)] w-[80px] flex justify-start items-center gap-2 flex-col ${matches && "hidden"}`}>
-            {groups.map((group, index: number) => (
-                <Link key={index} href={group.groupName}>
-                    {group.groupName}
+            className={`absolute bg-black h-[calc(100vh-52px)] w-[80px] flex justify-start items-center gap-2 flex-col`}>
+            {data && data.map((group, index: number) => (
+                <Link key={index} href={`${group.id}`}>
+                    {group.name}
                 </Link>
             ))}
             <Dialog>
