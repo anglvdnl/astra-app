@@ -1,5 +1,3 @@
-"use server"
-
 import Group from "@/components/Group";
 import {notFound, redirect} from "next/navigation";
 import axiosInstanceServer from "@/instances/axiosInstanceServer";
