@@ -115,6 +115,7 @@ function Group({groupId}: { groupId: string }) {
     }
 
     function createCard() {
+        // @ts-ignore
         createCardMutation.mutate({word: card.word, definition: card.definition, example: card.example})
         setCard({
             word: "",
@@ -123,7 +124,7 @@ function Group({groupId}: { groupId: string }) {
         })
     }
 
-    const handleInputChange = (field, value) => {
+    const handleInputChange = (field: string, value: string) => {
         setCard(prevState => ({
             ...prevState,
             [field]: value
