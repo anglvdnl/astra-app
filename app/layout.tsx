@@ -1,13 +1,22 @@
 import type {Metadata} from 'next'
-import {Inter} from 'next/font/google'
+import {Inter as FontSans, Montserrat} from "next/font/google"
 import './globals.css'
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import {CookiesProvider} from "next-client-cookies/server";
 import Providers from "@/app/providers";
 import ConditionalLayout from "@/components/ConditionalLayout";
+import {cn} from "@/utils/twMerge";
 
-const inter = Inter({ subsets: ['latin'] })
+const fontSans = FontSans({
+    subsets: ["latin"],
+    variable: "--font-sans",
+})
+
+const montserrat = Montserrat({
+    subsets: ["latin"],
+    variable: "--font-mont",
+})
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -22,13 +31,18 @@ export default function RootLayout({
   return (
       <CookiesProvider>
           <html lang="en">
-          <body className={inter.className}>
+          <body className={cn(
+              "min-h-screen bg-background font-sans antialiased",
+              fontSans.variable, montserrat.variable
+          )}>
           <Providers>
               <ConditionalLayout>
                   <Header/>
                   <Sidebar/>
               </ConditionalLayout>
-              {children}
+              <div className="w-[calc(100% - 5rem)] h-[calc(100vh-60px)] ml-20">
+                  {children}
+              </div>
           </Providers>
           </body>
           </html>

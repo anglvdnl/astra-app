@@ -30,7 +30,7 @@ function Login() {
             <h2 className="text-5xl mb-5">Login</h2>
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2">
                 <Input
-                    type="email"
+                    type="text"
                     id="email"
                     name="email"
                     value={formData.email}

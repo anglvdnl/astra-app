@@ -23,13 +23,11 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// Response interceptor
 axiosInstance.interceptors.response.use(
     (response) => {
         return response;
     },
     (error) => {
-        // Handle unauthorized errors
         console.log(error);
         if (error.response.status === 401) {
             window.location.href = "/auth"
