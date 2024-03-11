@@ -11,7 +11,9 @@ interface PageProps {
 }
 
 async function Page({searchParams}: PageProps) {
+    console.log(searchParams);
     if (searchParams && !searchParams.groupId) {
+        console.log("redirect");
         redirect("/")
     }
 

@@ -45,7 +45,7 @@ function Group({groupId}: { groupId: string }) {
         definition: "",
         example: ""
     })
-
+    console.log("groups");
     const queryClient = useQueryClient()
 
     const {data: bunchData} = useQuery<Bunch[]>({
