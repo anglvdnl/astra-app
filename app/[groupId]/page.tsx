@@ -7,12 +7,15 @@ import axiosInstanceServer from "@/instances/axiosInstanceServer";
 interface PageProps {
     searchParams: {
         groupId: string;
+        ready: boolean
     }
 }
 
+export const dynamic = 'force-dynamic';
+
 async function Page({searchParams}: PageProps) {
     console.log(searchParams);
-    if (searchParams && !searchParams.groupId) {
+    if (!searchParams.groupId) {
         console.log("redirect");
         redirect("/")
     }
