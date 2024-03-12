@@ -9,7 +9,7 @@ interface PageProps {
 
 export const dynamic = 'force-dynamic';
 
-async function Page(props) {
+async function Page(props: any) {
     console.log(props);
     // if (!searchParams.groupId) {
     //     console.log("redirect");
