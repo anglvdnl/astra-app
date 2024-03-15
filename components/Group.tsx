@@ -13,7 +13,6 @@ import {
     DrawerTrigger
 } from "@/components/ui/drawer";
 import {Check, Plus, Settings} from "lucide-react";
-import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import Bunch from "@/components/Bunch";
 import {useRouter} from "next/navigation";
@@ -26,6 +25,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import {DefaultInput} from "@/components/ui/defaultInput";
 
 interface Bunch {
     id: string;
@@ -138,7 +138,7 @@ function Group({groupId}: { groupId: string }) {
                 <DrawerContent>
                     <DrawerHeader className="flex items-center flex-col p-10 gap-5">
                         <DrawerTitle>Rename group:</DrawerTitle>
-                        <Input className="w-[200px]" onChange={(e) => setNewGroupName(e.target.value)}/>
+                        <DefaultInput className="w-[200px]" onChange={(e) => setNewGroupName(e.target.value)}/>
                         <div className="relative">
                             <Button disabled={groupNameMutation.isPending} onClick={changeGroupName}>Save</Button>
                             {isNameChanged &&
@@ -169,17 +169,19 @@ function Group({groupId}: { groupId: string }) {
                             </DialogHeader>
                             <div className="my-4">
                                 <p>Word</p>
-                                <Input value={card.word} onChange={e => handleInputChange("word", e.target.value)}
+                                <DefaultInput value={card.word}
+                                              onChange={e => handleInputChange("word", e.target.value)}
                                        type="text"/>
                             </div>
                             <div className="my-4">
                                 <p>Definition</p>
-                                <Input value={card.definition}
+                                <DefaultInput value={card.definition}
                                        onChange={e => handleInputChange("definition", e.target.value)} type="text"/>
                             </div>
                             <div className="my-4">
                                 <p>Example</p>
-                                <Input value={card.example} onChange={e => handleInputChange("example", e.target.value)}
+                                <DefaultInput value={card.example}
+                                              onChange={e => handleInputChange("example", e.target.value)}
                                        type="text"/>
                             </div>
                         </>
@@ -190,7 +192,8 @@ function Group({groupId}: { groupId: string }) {
                             </DialogHeader>
                             <div className="my-4">
                                 <p>Bunch name</p>
-                                <Input value={bunchName} onChange={e => setBunchName(e.target.value)} type="text"/>
+                                <DefaultInput value={bunchName} onChange={e => setBunchName(e.target.value)}
+                                              type="text"/>
                             </div>
                         </>
                     )}

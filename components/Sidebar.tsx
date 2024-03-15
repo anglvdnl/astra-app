@@ -12,12 +12,12 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import axiosInstance from "@/instances/axiosInstance";
 import {Plus} from "lucide-react";
 import {usePathname} from "next/navigation";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {DefaultInput} from "@/components/ui/defaultInput";
 
 interface Group {
     id: string;
@@ -107,7 +107,7 @@ function Sidebar() {
                         <DialogTitle>Add group</DialogTitle>
                     </DialogHeader>
                     <div className="my-4">
-                        <Input type="text" onChange={event => setGroupName(event.target.value)}/>
+                        <DefaultInput type="text" onChange={event => setGroupName(event.target.value)}/>
                     </div>
                     <DialogFooter>
                         <DialogClose>

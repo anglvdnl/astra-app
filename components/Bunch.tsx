@@ -11,9 +11,9 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import axiosInstance from "@/instances/axiosInstance";
+import {DefaultInput} from "@/components/ui/defaultInput";
 
 interface BunchProps {
     name: string;
@@ -80,7 +80,7 @@ function Bunch({name, id, description, groupId}: BunchProps) {
                     </DialogHeader>
                     <div className="my-4">
                         <p>Bunch name</p>
-                        <Input value={bunchName} onChange={e => setBunchName(e.target.value)} type="text"/>
+                        <DefaultInput value={bunchName} onChange={e => setBunchName(e.target.value)} type="text"/>
                     </div>
                     <DialogFooter className="flex sm:flex-row-reverse sm:justify-between">
                         <Button type="submit">Save changes</Button>
