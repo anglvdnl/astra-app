@@ -3,8 +3,12 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
+import useHideByRoute from "@/hooks/useHideByRoute";
+import Image from "next/image";
+import logo from '@/public/logo.svg'
 
 function Header() {
+    const hide = useHideByRoute(["/auth"])
     const {logout} = useAuth()
 
     function logoutUser() {
@@ -12,9 +16,9 @@ function Header() {
     }
 
     return (
-        <header className={`flex justify-between items-center px-5 py-2.5`}>
-            <p className="text-2xl font-mont">COGNIFY</p>
-            <Button onClick={logoutUser}>Logout</Button>
+        <header className={`flex justify-between items-center px-[60px] pt-9 ${hide ? "absolute" : ""}`}>
+            <Image src={logo} alt={"Logo"} width={180}/>
+            {!hide && <Button onClick={logoutUser}>Logout</Button>}
         </header>
     );
 }

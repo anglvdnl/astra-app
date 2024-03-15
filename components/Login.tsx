@@ -4,51 +4,130 @@ import React, {useState} from 'react';
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
+import {Label} from "@/components/ui/label";
+import Link from "next/link";
+import {Checkbox} from "@/components/ui/checkbox";
+import Image from "next/image";
+import hideIcon from "../components/ui/icons/hideIcon.svg"
+import showIcon from "../components/ui/icons/showIcon.svg"
+import googleLogo from "@/public/google-logo.png"
 
-function Login() {
-    const {loginMutation} = useAuth()
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
+import {useToast} from "@/components/ui/use-toast"
 
-    const handleInputChange = (event: any) => {
-        const {name, value} = event.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
+interface LoginProps {
+    toggleLayout: () => void
+}
 
-    const handleSubmit = async (event: any) => {
-        event.preventDefault();
-        loginMutation.mutate({data: formData})
+const FormSchema = z.object({
+    email: z.string().min(0, {
+        message: "Please enter your email.",
+    }).email("Please enter a valid email address."),
+    password: z.string().min(6, {
+        message: "Password must contain at least 6 characters."
+    })
+})
+
+function Login({toggleLayout}: LoginProps) {
+    const {loginMutation, loginGoogle} = useAuth()
+    const {toast} = useToast()
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            email: "",
+            password: ""
+        },
+    })
+    const [isPasswordShown, setIsPasswordShown] = useState(false)
+
+    async function onSubmit(data: z.infer<typeof FormSchema>, event: any) {
+        await loginMutation.mutateAsync({data: data}).catch((error) => {
+            console.log(error);
+            toast({
+                variant: "destructive",
+                title: error.response.data.error,
+            })
+        })
     }
 
     return (
-        <>
-            <h2 className="text-5xl mb-5">Login</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2">
-                <Input
-                    type="text"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder={"Email"}
-                />
-                <Input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder={"Password"}
-                />
-                <p>{loginMutation.error?.response?.data?.error}</p>
-                <Button disabled={loginMutation.isPending} type="submit">Submit</Button>
-            </form>
-        </>
+        <div className="max-w-[414px] flex flex-col items-center">
+            <h2 className="text-4xl mb-4">Sign In</h2>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({field}) => (
+                            <FormItem className="mb-[8px]">
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input className="mt-[6px]" {...field} />
+                                </FormControl>
+                                <FormMessage className="mt-[8px] text-base"/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
+                                        <Input className="mt-[6px]"
+                                               type={isPasswordShown ? "text" : "password"} {...field} />
+                                        {form.control._formValues?.password && <Image
+                                            className="absolute right-[20px] top-[50%] translate-y-[-50%]"
+                                            src={isPasswordShown ? hideIcon : showIcon}
+                                            alt={"Password icon"}
+                                            onClick={() => setIsPasswordShown(prev => !prev)}
+                                        />
+                                        }
+                                    </div>
+                                </FormControl>
+                                <FormMessage className="mt-[8px] text-base"/>
+                            </FormItem>
+                        )}
+                    />
+                    <div className="flex justify-between items-center my-[22px] w-[100%]">
+                        <div className="flex items-center gap-2">
+                            <Checkbox id="remember"/>
+                            <Label htmlFor={"remember"}>Remember me</Label>
+                        </div>
+                        <Link className="text-primary text-base font-semibold hover:underline"
+                              href="/auth/password-reset">Forgot
+                            password?</Link>
+                    </div>
+                    <Button
+                        className="w-[414px] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold"
+                        disabled={loginMutation.isPending} type="submit">Log In</Button>
+                </form>
+            </Form>
+            <p
+                className="text-base mt-[22px]"
+            >
+                Don&apos;t have an account?{'\u00A0'}
+                <span className="cursor-pointer text-primary hover:underline" onClick={toggleLayout}>Sign up</span>
+            </p>
+            <div className="flex justify-between items-center w-[100%] my-[22px]">
+                <hr className="w-[140px] h-[2px] bg-grey"/>
+                <p className="text-grey">Or</p>
+                <hr className="w-[140px] h-[2px] bg-grey"/>
+            </div>
+            <Button
+                className="w-[100%] py-4 h-auto text-base font-semibold"
+                variant="secondary"
+                onClick={() => loginGoogle()}
+            >
+                <Image className="mr-[12px]" src={googleLogo} alt={"Google"}/>
+                Sign In with Google
+            </Button>
+        </div>
     );
 }
 

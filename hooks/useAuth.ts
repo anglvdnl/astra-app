@@ -2,6 +2,7 @@ import {useMutation} from "@tanstack/react-query";
 import {useCookies} from "next-client-cookies";
 import {useRouter} from "next/navigation";
 import axiosInstance from "@/instances/axiosInstance";
+import {useGoogleLogin} from "@react-oauth/google";
 
 interface Data {
     data: {
@@ -32,7 +33,6 @@ function UseAuth() {
             router.push("/")
         },
         onError: (error: Error) => {
-            console.log(error.response.data.error);
         }
     })
 
@@ -50,12 +50,18 @@ function UseAuth() {
         }
     })
 
+    const loginGoogle = useGoogleLogin({
+        onSuccess: tokenResponse => console.log(tokenResponse),
+        onError: errorResponse => console.log("error", errorResponse)
+    });
+
     const logout = () => {
         cookies.remove("auth")
         router.push("/auth")
     }
 
     return {
+        loginGoogle,
         loginMutation,
         registerMutation,
         logout
