@@ -1,9 +1,8 @@
 "use client"
 
-import React, {useState} from 'react';
+import React from 'react';
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import useAuth from "@/hooks/useAuth";
 import {Label} from "@/components/ui/label";
 import Link from "next/link";
 import {Checkbox} from "@/components/ui/checkbox";
@@ -12,54 +11,30 @@ import hideIcon from "../components/ui/icons/hideIcon.svg"
 import showIcon from "../components/ui/icons/showIcon.svg"
 import googleLogo from "@/public/google-logo.png"
 
-import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
-import {z} from "zod"
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
-import {useToast} from "@/components/ui/use-toast"
+import {withAuthForm} from "@/components/hocs/withAuthForm";
 
 interface LoginProps {
-    toggleLayout: () => void
+    toggleLayout: () => void;
+    form: any;
+    onSubmit: () => void;
+    isPasswordShown: boolean;
+    setIsPasswordShown: (prev: (prevState: boolean) => boolean) => boolean;
+    authMethod: {
+        loginMutation: { isPending: boolean; },
+        loginGoogle: () => void,
+    }
 }
 
-const FormSchema = z.object({
-    email: z.string().min(0, {
-        message: "Please enter your email.",
-    }).email("Please enter a valid email address."),
-    password: z.string().min(6, {
-        message: "Password must contain at least 6 characters."
-    })
-})
-
-function Login({toggleLayout}: LoginProps) {
-    const {loginMutation, loginGoogle} = useAuth()
-    const {toast} = useToast()
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            email: "",
-            password: ""
-        },
-    })
-    const [isPasswordShown, setIsPasswordShown] = useState(false)
-
-    async function onSubmit(data: z.infer<typeof FormSchema>, event: any) {
-        await loginMutation.mutateAsync({data: data}).catch((error) => {
-            console.log(error);
-            toast({
-                variant: "destructive",
-                title: error.response.data.error,
-            })
-        })
-    }
+function Login({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordShown, authMethod}: LoginProps) {
 
     return (
-        <div className="max-w-[414px] flex flex-col items-center">
+        <div className="max-w-[414px] w-[100%] flex flex-col items-center">
             <h2 className="text-4xl mb-4">Sign In</h2>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center">
+                <form onSubmit={form?.handleSubmit(onSubmit)} className="flex flex-col items-center w-[100%]">
                     <FormField
-                        control={form.control}
+                        control={form?.control}
                         name="email"
                         render={({field}) => (
                             <FormItem className="mb-[8px]">
@@ -72,24 +47,25 @@ function Login({toggleLayout}: LoginProps) {
                         )}
                     />
                     <FormField
-                        control={form.control}
+                        control={form?.control}
                         name="password"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <div className="relative">
+                                <div className="relative">
+                                    <FormControl>
                                         <Input className="mt-[6px]"
                                                type={isPasswordShown ? "text" : "password"} {...field} />
-                                        {form.control._formValues?.password && <Image
+                                    </FormControl>
+                                    {form?.control._formValues?.password &&
+                                        <Image
                                             className="absolute right-[20px] top-[50%] translate-y-[-50%]"
                                             src={isPasswordShown ? hideIcon : showIcon}
                                             alt={"Password icon"}
-                                            onClick={() => setIsPasswordShown(prev => !prev)}
+                                            onClick={() => setIsPasswordShown(prevState => !prevState)}
                                         />
-                                        }
-                                    </div>
-                                </FormControl>
+                                    }
+                                </div>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
                         )}
@@ -100,12 +76,12 @@ function Login({toggleLayout}: LoginProps) {
                             <Label htmlFor={"remember"}>Remember me</Label>
                         </div>
                         <Link className="text-primary text-base font-semibold hover:underline"
-                              href="/auth/password-reset">Forgot
+                              href="/components/auth/password-reset">Forgot
                             password?</Link>
                     </div>
                     <Button
-                        className="w-[414px] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold"
-                        disabled={loginMutation.isPending} type="submit">Log In</Button>
+                        className="w-[100%] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold"
+                        disabled={authMethod.loginMutation.isPending} type="submit">Log In</Button>
                 </form>
             </Form>
             <p
@@ -122,7 +98,7 @@ function Login({toggleLayout}: LoginProps) {
             <Button
                 className="w-[100%] py-4 h-auto text-base font-semibold"
                 variant="secondary"
-                onClick={() => loginGoogle()}
+                onClick={() => authMethod.loginGoogle()}
             >
                 <Image className="mr-[12px]" src={googleLogo} alt={"Google"}/>
                 Sign In with Google
@@ -131,4 +107,4 @@ function Login({toggleLayout}: LoginProps) {
     );
 }
 
-export default Login;
+export default withAuthForm({Form: Login, type: "login"});

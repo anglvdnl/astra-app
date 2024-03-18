@@ -42,11 +42,17 @@ export default function RootLayout({
                     <html lang="en">
                     <body className={cn("min-h-screen bg-background font-sans antialiased", gilroy.variable)}>
                     <Providers>
-                        <Header/>
-                        <ConditionalLayout>
-                            <Sidebar/>
-                        </ConditionalLayout>
-                        {children}
+                        <div className="flex">
+                            <ConditionalLayout>
+                                <Sidebar/>
+                            </ConditionalLayout>
+                            <div className="flex-1 pl-6 pt-9 pr-11">
+                                <ConditionalLayout>
+                                    <Header/>
+                                </ConditionalLayout>
+                                {children}
+                            </div>
+                        </div>
                         <Toaster/>
                     </Providers>
                     </body>

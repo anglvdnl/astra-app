@@ -19,6 +19,9 @@ module.exports = {
       },
     },
     extend: {
+      screens: {
+        'maxH950': { 'raw': '(max-height: 950px)' },
+      },
       fontFamily: {
         sans: ["var(--gilroy)", ...fontFamily.sans],
       },

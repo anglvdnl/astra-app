@@ -1,61 +1,35 @@
 "use client"
 
-import React, {useState} from 'react';
+import React from 'react';
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import useAuth from "@/hooks/useAuth";
 import Image from "next/image";
 import hideIcon from "../components/ui/icons/hideIcon.svg"
 import showIcon from "../components/ui/icons/showIcon.svg"
 import googleLogo from "@/public/google-logo.png";
-import {useToast} from "@/components/ui/use-toast";
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {withAuthForm} from "@/components/hocs/withAuthForm";
+import CustomTooltip from "@/components/CustomTooltip";
 
 interface LoginProps {
-    toggleLayout: () => void
+    toggleLayout: () => void;
+    form: any;
+    onSubmit: () => void;
+    isPasswordShown: boolean;
+    setIsPasswordShown: (prev: (prevState: boolean) => boolean) => boolean;
+    authMethod: {
+        registerMutation: { isPending: boolean; },
+        loginGoogle: () => void,
+    }
 }
 
-const FormSchema = z.object({
-    username: z.string().min(1, {
-        message: "Please enter a username"
-    }),
-    email: z.string().email("Please enter a valid email address."),
-    password: z.string().min(6, {
-        message: "Password must contain at least 6 characters."
-    })
-})
-
-function Register({toggleLayout}: LoginProps) {
-    const {registerMutation} = useAuth()
-    const {toast} = useToast()
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            username: "",
-            email: "",
-            password: ""
-        },
-    })
-    const [isPasswordShown, setIsPasswordShown] = useState(false)
-
-    async function onSubmit(data: z.infer<typeof FormSchema>, event: any) {
-        await registerMutation.mutateAsync({data: data}).catch((error) => {
-            console.log(error);
-            toast({
-                variant: "destructive",
-                title: error.response.data.error,
-            })
-        })
-    }
+function Register({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordShown, authMethod}: LoginProps) {
 
     return (
-        <div className="max-w-[414px] flex flex-col items-center">
+        <div className="max-w-[414px] w-[100%] flex flex-col items-center">
             <h2 className="text-4xl mb-4">Sign Up</h2>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center w-[100%]">
                     <FormField
                         control={form.control}
                         name="username"
@@ -63,7 +37,7 @@ function Register({toggleLayout}: LoginProps) {
                             <FormItem className="mb-[8px]">
                                 <FormLabel>Username</FormLabel>
                                 <FormControl>
-                                    <Input className="mt-[6px]" {...field} />
+                                    <Input className="mt-[6px]" {...field} autoComplete="off"/>
                                 </FormControl>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
@@ -76,7 +50,7 @@ function Register({toggleLayout}: LoginProps) {
                             <FormItem className="mb-[8px]">
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input className="mt-[6px]" {...field} />
+                                    <Input className="mt-[6px]" {...field} autoComplete="off"/>
                                 </FormControl>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
@@ -87,27 +61,37 @@ function Register({toggleLayout}: LoginProps) {
                         name="password"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <div className="relative">
-                                        <Input className="mt-[6px]"
-                                               type={isPasswordShown ? "text" : "password"} {...field} />
-                                        {form.control._formValues?.password && <Image
+                                <div className={"flex gap-2 items-center"}>
+                                    <FormLabel>Password</FormLabel>
+                                    <CustomTooltip side={"right"} className="max-w-[344px]">
+                                        <p>Must be at least 8 characters with letters or/and numbers.</p>
+                                    </CustomTooltip>
+                                </div>
+
+                                <div className="relative">
+                                    <FormControl>
+                                        <Input
+                                            className="mt-[6px]"
+                                            type={isPasswordShown ? "text" : "password"} {...field}
+                                            autoComplete="off"
+                                        />
+                                    </FormControl>
+                                    {form.control._formValues?.password &&
+                                        <Image
                                             className="absolute right-[20px] top-[50%] translate-y-[-50%]"
                                             src={isPasswordShown ? hideIcon : showIcon}
                                             alt={"Password icon"}
                                             onClick={() => setIsPasswordShown(prev => !prev)}
                                         />
-                                        }
-                                    </div>
-                                </FormControl>
+                                    }
+                                </div>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
                         )}
                     />
                     <Button
-                        className="w-[414px] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold mt-[22px]"
-                        disabled={registerMutation.isPending} type="submit">Create an account</Button>
+                        className="w-[100%] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold mt-[22px]"
+                        disabled={authMethod.registerMutation.isPending} type="submit">Create an account</Button>
                 </form>
             </Form>
             <p
@@ -124,6 +108,7 @@ function Register({toggleLayout}: LoginProps) {
             <Button
                 className="w-[100%] py-4 h-auto text-base font-semibold"
                 variant="secondary"
+                onClick={() => authMethod.loginGoogle()}
             >
                 <Image className="mr-[12px]" src={googleLogo} alt={"Google"}/>
                 Sign Up with Google
@@ -132,4 +117,4 @@ function Register({toggleLayout}: LoginProps) {
     );
 }
 
-export default Register;
+export default withAuthForm({Form: Register, type: "register"});

@@ -1,23 +1,12 @@
 "use client"
 
 import React, {useState} from 'react';
-import Link from "next/link";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import axiosInstance from "@/instances/axiosInstance";
-import {Plus} from "lucide-react";
-import {usePathname} from "next/navigation";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {DefaultInput} from "@/components/ui/defaultInput";
+import logoIcon from "@/public/logoIcon.svg";
+import leftArrow from "@/public/leftArrow.svg";
+import Image from "next/image";
+import {motion} from "framer-motion";
+import {asideVariants} from "@/framerVariants/sidebarVariants";
 
 interface Group {
     id: string;
@@ -26,97 +15,41 @@ interface Group {
 }
 
 function Sidebar() {
-    const [groupName, setGroupName] = useState("")
-    const pathname = usePathname()
-    const queryClient = useQueryClient()
-
-    const {data} = useQuery<Group[]>({
-        queryKey: ["groups"],
-        queryFn: async () => {
-            const response = await axiosInstance.get("/groups")
-            return response.data as Group[]
-        }
-    })
-
-    // const data = [
-    //     {
-    //         name: "japanese",
-    //         id: "1234"
+    const [sidebarOpened, setSidebarOpened] = useState(true)
+    //
+    // function formatGroupName(name: string): string {
+    //     let words = name.split(' ');
+    //
+    //     if (words.length > 1) {
+    //         return words.splice(0, 2).map(word => word.slice(0, 1)).join('').toUpperCase();
+    //     } else {
+    //         return name.charAt(0).toUpperCase()
     //     }
-    // ]
-
-    const {mutate} = useMutation({
-        mutationFn: async ({data}: { data: { name: string, description: string } }) => {
-            const response = await axiosInstance.post("/groups", data)
-            return response.data
-        },
-        onSuccess: (response) => {
-            console.log(response);
-            queryClient.invalidateQueries({queryKey: ['groups']})
-        },
-        onError: (error) => {
-            console.log(error);
-        }
-    })
-
-    function createNewGroup() {
-        mutate({data: {name: groupName, description: ""}})
-    }
-
-    function formatGroupName(name: string): string {
-        let words = name.split(' ');
-
-        if (words.length > 1) {
-            return words.splice(0, 2).map(word => word.slice(0, 1)).join('').toUpperCase();
-        } else {
-            return name.charAt(0).toUpperCase()
-        }
-    }
+    // }
 
     return (
-        <aside
-            className={`absolute bg-[linear-gradient(180deg,_#404040_00%,_#030712_80%)] h-[calc(100vh-60px)] w-[80px] flex justify-start items-center gap-2 flex-col rounded-tr-lg`}>
-            {data && data.map((group, index: number) => (
-                <TooltipProvider key={index} delayDuration={300}>
-                    <Tooltip>
-                        <TooltipTrigger className="mt-5">
-                            <Link href={{
-                                pathname: `/${encodeURIComponent(group.name)}`,
-                                query: {groupId: group.id},
-                            }}
-                                  replace={true}
-                                  className="transition-all ease-in-out relative group/item w-[40px] h-[40px] bg-[#D9D9D9] flex justify-center items-center border border-white text-black rounded-lg font-semibold">
-                                <hr className={`${pathname.split("/")[1] == encodeURIComponent(group.name) ? "opacity-100" : "opacity-0"} group/line opacity-0 group-hover/item:opacity-100 absolute w-[100%] h-[3px] bottom-[-10px] bg-[#D9D9D9] transition-all ease-in-out`}></hr>
-                                {formatGroupName(group.name)}
-                            </Link>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{group.name}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            ))}
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button className="bg-transparent hover:bg-transparent" size="icon">
-                        <Plus/>
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Add group</DialogTitle>
-                    </DialogHeader>
-                    <div className="my-4">
-                        <DefaultInput type="text" onChange={event => setGroupName(event.target.value)}/>
-                    </div>
-                    <DialogFooter>
-                        <DialogClose>
-                            <Button type="submit" onClick={createNewGroup}>Save changes</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </aside>
+        <motion.aside
+            variants={asideVariants}
+            custom={sidebarOpened}
+            initial={"initial"}
+            animate={"animate"}
+            className={`bg-secondary h-screen flex justify-between items-center flex-col pt-9`}>
+            <div className={"flex justify-center items-center"}>
+                {/*<AnimatePresence>*/}
+                {/*    {sidebarOpened &&*/}
+                {/*        <motion.div initial={{opacity: 0, width: "145px"}} animate={{opacity: 1, width : "145px"}} exit={{opacity: 0, width: 0}}>*/}
+                {/*            <Image src={logoText} alt={"Logo text"}/>*/}
+                {/*        </motion.div>*/}
+                {/*    }*/}
+                {/*</AnimatePresence>*/}
+                <Image src={logoIcon} alt={"Logo icon"} width={40}/>
+            </div>
+            <Button variant="ghost" className="w-full flex items-center justify-start gap-3 text-base font-semibold"
+                    onClick={() => setSidebarOpened(prev => !prev)}>
+                <Image src={leftArrow} alt={"Close arrow"}/>
+                <span>Hide Panel</span>
+            </Button>
+        </motion.aside>
     );
 }
 
