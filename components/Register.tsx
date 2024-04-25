@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import {Input} from "@/components/ui/input";
+import {FormInput} from "@/components/ui/formInput";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import hideIcon from "../components/ui/icons/hideIcon.svg"
@@ -37,7 +37,7 @@ function Register({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordS
                             <FormItem className="mb-[8px]">
                                 <FormLabel>Username</FormLabel>
                                 <FormControl>
-                                    <Input className="mt-[6px]" {...field} autoComplete="off"/>
+                                    <FormInput className="mt-[6px]" {...field} autoComplete="off"/>
                                 </FormControl>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
@@ -50,7 +50,7 @@ function Register({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordS
                             <FormItem className="mb-[8px]">
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input className="mt-[6px]" {...field} autoComplete="off"/>
+                                    <FormInput className="mt-[6px]" {...field} autoComplete="off"/>
                                 </FormControl>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
@@ -70,7 +70,7 @@ function Register({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordS
 
                                 <div className="relative">
                                     <FormControl>
-                                        <Input
+                                        <FormInput
                                             className="mt-[6px]"
                                             type={isPasswordShown ? "text" : "password"} {...field}
                                             autoComplete="off"
@@ -90,7 +90,7 @@ function Register({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordS
                         )}
                     />
                     <Button
-                        className="w-[100%] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold mt-[22px]"
+                        className="w-[100%] h-[62px] flex justify-center items-center text-xl font-semibold mt-[22px]"
                         disabled={authMethod.registerMutation.isPending} type="submit">Create an account</Button>
                 </form>
             </Form>

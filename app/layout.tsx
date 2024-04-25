@@ -9,6 +9,7 @@ import ConditionalLayout from "@/components/ConditionalLayout";
 import {cn} from "@/utils/twMerge";
 import {Toaster} from "@/components/ui/toaster";
 import {GoogleOAuthProvider} from "@react-oauth/google";
+import {Suspense} from "react";
 
 const gilroy = localFont({
     src: [
@@ -36,11 +37,11 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <>
-            <GoogleOAuthProvider clientId={process.env.GOOGLE_AUTH_KEY}>
-                <CookiesProvider>
-                    <html lang="en">
-                    <body className={cn("min-h-screen bg-background font-sans antialiased", gilroy.variable)}>
+        <GoogleOAuthProvider clientId={process.env.GOOGLE_AUTH_KEY}>
+            <CookiesProvider>
+                <html lang="en">
+                <body className={cn("min-h-screen bg-background font-sans antialiased", gilroy.variable)}>
+                <Suspense fallback={<div>Loading...</div>}>
                     <Providers>
                         <div className="flex">
                             <ConditionalLayout>
@@ -50,15 +51,17 @@ export default function RootLayout({
                                 <ConditionalLayout>
                                     <Header/>
                                 </ConditionalLayout>
-                                {children}
+                                <div className="mt-6">
+                                    {children}
+                                </div>
                             </div>
                         </div>
                         <Toaster/>
                     </Providers>
-                    </body>
-                    </html>
-                </CookiesProvider>
-            </GoogleOAuthProvider>
-        </>
+                </Suspense>
+                </body>
+                </html>
+            </CookiesProvider>
+        </GoogleOAuthProvider>
     )
 }

@@ -30,7 +30,6 @@ export function withAuthForm({Form, type}: withAuthFormProps) {
         const [isPasswordShown, setIsPasswordShown] = useState(false);
 
         async function onSubmit(data: z.infer<typeof formSchema>) {
-            console.log(data);
             await currentAuthMethod[type].mutateAsync({data: data}).catch((error: any) => {
                 console.log(error);
                 toast({

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/drawer";
 import {Check, Plus, Settings} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import Bunch from "@/components/Bunch";
+import Bunch from "@/components/Bunches/Bunch";
 import {useRouter} from "next/navigation";
 import {
     Dialog,
@@ -25,7 +25,8 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {DefaultInput} from "@/components/ui/defaultInput";
+import {Input} from "@/components/ui/input";
+import Link from 'next/link';
 
 interface Bunch {
     id: string;
@@ -33,185 +34,47 @@ interface Bunch {
     description: string;
 }
 
-function Group({groupId}: { groupId: string }) {
-    const router = useRouter()
-    const [newGroupName, setNewGroupName] = useState("")
-    const [isNameChanged, setIsNameChanged] = useState(false)
-    const [bunchName, setBunchName] = useState("")
-    const [isBunchCreated, setIsBunchCreated] = useState(false)
-    const [bunchId, setBunchId] = useState("")
-    const [card, setCard] = useState({
-        word: "",
-        definition: "",
-        example: ""
-    })
-    console.log("groups");
+interface GroupProps {
+    name: string;
+    id: string;
+}
+
+function Group({name, id}: GroupProps) {
     const queryClient = useQueryClient()
 
-    const {data: bunchData} = useQuery<Bunch[]>({
-        queryKey: ["bunches", groupId],
+    const {data: bunches} = useQuery<Bunch[]>({
+        queryKey: ["bunches", id],
         queryFn: async () => {
-            const {data} = await axiosInstance.get(`/groups/${groupId}/bunches`)
-            return data as Bunch[]
+            const {data} = await axiosInstance.get(`/groups/${id}/bunches`)
+            return data
         }
     })
 
-    const groupNameMutation = useMutation({
-        mutationFn: async ({groupName}: { groupName: string }) => {
-            const response = await axiosInstance.patch(`/groups/${groupId}`, {
-                name: groupName
-            })
+    function formatGroupName(name: string): string {
+        let words = name.split(' ');
 
-            return response.data
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['groups']})
-            setIsNameChanged(true)
+        if (words.length > 1) {
+            return words.splice(0, 2).map(word => word.slice(0, 1)).join('').toUpperCase();
+        } else {
+            return name.charAt(0).toUpperCase()
         }
-    })
-
-    const groupDeleteMutation = useMutation({
-        mutationFn: async () => {
-            return await axiosInstance.delete(`/groups/${groupId}`)
-        },
-        onSuccess: (response) => {
-            queryClient.invalidateQueries({queryKey: ['groups']})
-            router.push("/")
-        }
-    })
-
-    const createBunchMutation = useMutation({
-        mutationFn: async (bunchName: string) => {
-            return await axiosInstance.post(`/groups/${groupId}/bunches`, {
-                name: bunchName,
-                description: ""
-            })
-        },
-        onSuccess: (response) => {
-            console.log(response);
-            queryClient.invalidateQueries({queryKey: ['bunches']})
-            setBunchId(response.data.response.id)
-        }
-    })
-
-    const createCardMutation = useMutation({
-        mutationFn: async (card) => {
-            return await axiosInstance.post(`/bunches/${bunchId}/cards`, card)
-        }
-    })
-
-    function changeGroupName() {
-        groupNameMutation.mutate({groupName: newGroupName})
     }
-
-    function deleteGroup() {
-        groupDeleteMutation.mutate()
-    }
-
-    function createBunch() {
-        setBunchName("")
-        setIsBunchCreated(true)
-        createBunchMutation.mutate(bunchName)
-    }
-
-    function createCard() {
-        // @ts-ignore
-        createCardMutation.mutate({word: card.word, definition: card.definition, example: card.example})
-        setCard({
-            word: "",
-            definition: "",
-            example: ""
-        })
-    }
-
-    const handleInputChange = (field: string, value: string) => {
-        setCard(prevState => ({
-            ...prevState,
-            [field]: value
-        }));
-    };
 
     return (
-        <div className="ml-[100px] p-5">
-            <Drawer>
-                <DrawerTrigger className="float-right"><Settings className="cursor-pointer"/></DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader className="flex items-center flex-col p-10 gap-5">
-                        <DrawerTitle>Rename group:</DrawerTitle>
-                        <DefaultInput className="w-[200px]" onChange={(e) => setNewGroupName(e.target.value)}/>
-                        <div className="relative">
-                            <Button disabled={groupNameMutation.isPending} onClick={changeGroupName}>Save</Button>
-                            {isNameChanged &&
-                                <Check className="text-green-500 absolute top-[50%] translate-y-[-50%] right-[-35px]"/>}
-                        </div>
-                    </DrawerHeader>
-                    <DrawerFooter>
-                        <DrawerClose>
-                            <Button variant="destructive" onClick={deleteGroup}>Delete group</Button>
-                        </DrawerClose>
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
-            <Dialog onOpenChange={isOpened => {
-                if (!isOpened) {
-                    setIsBunchCreated(false)
-                    setBunchId("")
-                }
-            }}>
-                <DialogTrigger asChild>
-                    <Button className="flex gap-1 mb-5">Create bunch <Plus/></Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    {isBunchCreated ? (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle>Add Card</DialogTitle>
-                            </DialogHeader>
-                            <div className="my-4">
-                                <p>Word</p>
-                                <DefaultInput value={card.word}
-                                              onChange={e => handleInputChange("word", e.target.value)}
-                                       type="text"/>
-                            </div>
-                            <div className="my-4">
-                                <p>Definition</p>
-                                <DefaultInput value={card.definition}
-                                       onChange={e => handleInputChange("definition", e.target.value)} type="text"/>
-                            </div>
-                            <div className="my-4">
-                                <p>Example</p>
-                                <DefaultInput value={card.example}
-                                              onChange={e => handleInputChange("example", e.target.value)}
-                                       type="text"/>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle>Add bunch</DialogTitle>
-                            </DialogHeader>
-                            <div className="my-4">
-                                <p>Bunch name</p>
-                                <DefaultInput value={bunchName} onChange={e => setBunchName(e.target.value)}
-                                              type="text"/>
-                            </div>
-                        </>
-                    )}
-                    <DialogFooter className="flex sm:flex-row-reverse sm:justify-between">
-                        <Button type="submit" onClick={isBunchCreated ? createCard : createBunch}>Save changes</Button>
-                        <DialogClose className="w-[fit-content]">
-                            <Button variant="secondary">Close</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-            <div className="flex gap-10 w-[100%] flex-wrap">
-                {bunchData && bunchData.map((bunch, index) => (
-                    <Bunch key={index} name={bunch.name} id={bunch.id} description={bunch.description}
-                           groupId={groupId}/>
-                ))}
+        <Link href={{
+            pathname: `groups/${name}`,
+            query: {groupId: id},
+        }}>
+            <div className="w-[300px] h-[110px] bg-secondary rounded-xl p-6 flex justify-between items-center">
+                <div className="flex flex-col justify-between h-full">
+                    <h2 className="text-xl">{name}</h2>
+                    <p className="text-neutral text-sm">{bunches && bunches.length} bunches</p>
+                </div>
+                <div className="w-[62px] h-[62px] bg-destructive rounded-xl p-3 flex items-center justify-center">
+                    <p className="text-4xl text-black">{formatGroupName(name)}</p>
+                </div>
             </div>
-        </div>
+        </Link>
     );
 }
 

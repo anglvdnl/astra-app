@@ -9,3 +9,15 @@ export const defaultValues = {
         password: ""
     }
 }
+
+export const defaultCreateValues = {
+    group: {
+        name: "",
+        description: "",
+        image: ""
+    },
+    bunch: {
+        name: "",
+        description: "",
+    }
+}

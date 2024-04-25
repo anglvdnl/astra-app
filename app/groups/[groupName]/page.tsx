@@ -1,6 +1,7 @@
 import Group from "@/components/Group";
 import {notFound, redirect} from "next/navigation";
 import axiosInstanceServer from "@/instances/axiosInstanceServer";
+import Bunches from "@/components/Bunches/Bunches";
 
 interface PageProps {
     searchParams: {
@@ -9,25 +10,30 @@ interface PageProps {
 }
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0
 
 async function Page({searchParams}: PageProps) {
     if (!searchParams.groupId) {
-        redirect("/")
+        redirect("/groups")
     }
 
     const response = await axiosInstanceServer.get("/groups")
 
+    const currentGroup = response.data.find((group: {
+        name: string,
+        id: string,
+        description: string
+    }) => group.id === searchParams.groupId)
+
+    console.log(currentGroup);
+
     if (response.data) {
-        const groupExists = response.data.some((group: {
-            name: string,
-            id: string
-        }) => group.id === searchParams.groupId);
-        if (!groupExists) {
+        if (!currentGroup) {
             return notFound();
         }
     }
 
-    return <Group groupId={searchParams.groupId}/>
+    return <Bunches group={currentGroup}/>
 }
 
 export default Page;

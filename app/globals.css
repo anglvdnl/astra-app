@@ -20,7 +20,10 @@
     --accent-foreground: 210 20% 98%;
       --destructive: #FB9B9A;
     --destructive-foreground: 210 20% 98%;
+      --cyan: #11EDE9;
+      --dark-cyan: #124342;
       --grey: #515151;
+      --neutral: #939393;
       --border: #1E1E1E;
       --input: #1E1E1E;
       --ring: #B88AFD;
@@ -38,10 +41,20 @@ input:-webkit-autofill:active {
     background: #1E1E1E !important;
     caret-color: white !important;
 }
- 
+
+img {
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
 @layer base {
   * {
     @apply border-border;
+      box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;

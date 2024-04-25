@@ -51,8 +51,17 @@ module.exports = {
           DEFAULT: "var(--accent)",
           foreground: "hsl(var(--accent-foreground))",
         },
+        cyan: {
+          DEFAULT: "var(--cyan)",
+        },
+        darkCyan: {
+          DEFAULT: "var(--dark-cyan)"
+        },
         grey: {
           DEFAULT: "var(--grey)"
+        },
+        neutral: {
+          DEFAULT: "var(--neutral)"
         },
         popover: {
           DEFAULT: "var(--popover)",

@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import {Input} from "@/components/ui/input";
+import {FormInput} from "@/components/ui/formInput";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import Link from "next/link";
@@ -40,7 +40,7 @@ function Login({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordShow
                             <FormItem className="mb-[8px]">
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input className="mt-[6px]" {...field} />
+                                    <FormInput className="mt-[6px]" {...field} />
                                 </FormControl>
                                 <FormMessage className="mt-[8px] text-base"/>
                             </FormItem>
@@ -54,8 +54,8 @@ function Login({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordShow
                                 <FormLabel>Password</FormLabel>
                                 <div className="relative">
                                     <FormControl>
-                                        <Input className="mt-[6px]"
-                                               type={isPasswordShown ? "text" : "password"} {...field} />
+                                        <FormInput className="mt-[6px]"
+                                                   type={isPasswordShown ? "text" : "password"} {...field} />
                                     </FormControl>
                                     {form?.control._formValues?.password &&
                                         <Image
@@ -80,7 +80,7 @@ function Login({toggleLayout, form, onSubmit, isPasswordShown, setIsPasswordShow
                             password?</Link>
                     </div>
                     <Button
-                        className="w-[100%] h-[62px] bg-primary flex justify-center items-center text-black text-xl font-semibold"
+                        className="w-[100%] h-[62px] flex justify-center items-center text-xl font-semibold"
                         disabled={authMethod.loginMutation.isPending} type="submit">Log In</Button>
                 </form>
             </Form>
