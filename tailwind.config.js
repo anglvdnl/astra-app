@@ -63,6 +63,9 @@ module.exports = {
         neutral: {
           DEFAULT: "var(--neutral)"
         },
+        inactive: {
+          DEFAULT: "var(--inactive)"
+        },
         popover: {
           DEFAULT: "var(--popover)",
           foreground: "hsl(var(--popover-foreground))",

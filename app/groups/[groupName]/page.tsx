@@ -1,4 +1,3 @@
-import Group from "@/components/Group";
 import {notFound, redirect} from "next/navigation";
 import axiosInstanceServer from "@/instances/axiosInstanceServer";
 import Bunches from "@/components/Bunches/Bunches";

@@ -12,6 +12,7 @@ export const creationSchema = {
         name: z.string().min(1, {
             message: "Please enter bunch name.",
         }),
-        description: z.string()
+        description: z.string(),
+        language: z.string()
     })
 }

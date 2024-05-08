@@ -6,13 +6,12 @@ import logoIcon from "@/public/logoIcon.svg";
 import leftArrow from "@/public/leftArrow.svg";
 import logo from "@/public/logo.svg";
 import settings from "@/public/settings.svg";
-import logoutIcon from "@/public/logout.svg";
+import archive from "@/public/archive.svg";
 import home from "@/public/home.svg";
 import groups from "@/public/groups.svg";
 import Image from "next/image";
 import {AnimatePresence, LayoutGroup, motion} from "framer-motion";
 import {
-    activeLinkVariants,
     arrowVariants,
     asideVariants,
     iconVariants,
@@ -139,7 +138,7 @@ function Sidebar() {
             </div>
             <div className="w-full flex flex-col gap-10">
                 <Button variant="ghost"
-                        className="w-full flex items-center justify-start gap-3 text-base font-semibold px-9"
+                        className="w-full flex items-center justify-start gap-3 text-base font-semibold px-9 h-auto py-0"
                         onClick={handleSidebar}>
                     <motion.div variants={arrowVariants} custom={sidebarOpened} animate={"animate"}>
                         <Image className="min-w-[24px]" src={leftArrow} alt={"Close arrow"}/>
@@ -184,12 +183,10 @@ function Sidebar() {
                         </AnimatePresence>
                     </LayoutGroup>
                 </Link>
-                <Button
-                    variant="ghost"
+                <Link
                     className="w-full flex items-center justify-start gap-3 text-base font-semibold px-9"
-                    onClick={() => logout()}
-                >
-                    <Image className="min-w-[24px]" src={logoutIcon} alt={"Close arrow"}/>
+                    href="/archive">
+                    <Image className="min-w-[24px]" src={archive} alt={"Close arrow"}/>
                     <LayoutGroup>
                         <AnimatePresence initial={false}>
                             {showItems && sidebarOpened && (
@@ -202,12 +199,12 @@ function Sidebar() {
                                     exit={"exit"}
                                     className="max-w-full"
                                 >
-                                    Logout
+                                    Archive
                                 </motion.span>
                             )}
                         </AnimatePresence>
                     </LayoutGroup>
-                </Button>
+                </Link>
             </div>
         </motion.aside>
     )

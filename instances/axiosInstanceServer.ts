@@ -3,6 +3,7 @@
 import axios from 'axios';
 import {cookies} from "next/headers";
 import * as https from "https";
+import {redirect} from "next/navigation";
 
 const axiosInstanceServer = axios.create({
     httpsAgent: new https.Agent({
@@ -33,7 +34,7 @@ axiosInstanceServer.interceptors.response.use(
     (error) => {
         console.log(error);
         if (error.response.status === 401) {
-            console.log("401");
+            redirect("/auth")
         }
 
         return Promise.reject(error);

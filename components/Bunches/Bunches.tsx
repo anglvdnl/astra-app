@@ -14,10 +14,6 @@ import {Button} from "@/components/ui/button";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
 import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
-import plus from "@/public/plusIcon.svg";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import border from "@/public/dashedBorder.png";
 import CreationForm from "@/components/forms/creationForm";
 
 interface BunchesProps {
@@ -93,6 +89,7 @@ function Bunches({group}: BunchesProps) {
             return data
         }, onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['groups']})
+            router.refresh()
             setDialog("")
             toast({
                 title: "Group edited successfully"

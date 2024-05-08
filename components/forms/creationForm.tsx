@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -9,6 +9,9 @@ import {FormInput} from "@/components/ui/formInput";
 import Image from "next/image";
 import {Button} from "@/components/ui/button";
 import border from "@/public/dashedBorder.png";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Label} from "@/components/ui/label";
 
 interface CreationFormProps {
     formName: string;
@@ -24,12 +27,26 @@ interface CreationFormProps {
     }
 }
 
-function CreationForm({formName, type, hasIconSelect, onSubmit, isPending, isEditing, values}: CreationFormProps) {
+function CreationForm({
+                          formName,
+                          type,
+                          hasIconSelect,
+                          onSubmit,
+                          isPending,
+                          isEditing,
+                          values,
+                      }: CreationFormProps) {
     const formSchema = creationSchema[type]
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: !isEditing ? defaultCreateValues[type] : values
     });
+    const [showSelect, setShowSelect] = useState(false)
+
+    function handleCheckbox() {
+        setShowSelect(prev => !prev)
+        form.setValue("language", "")
+    }
 
     return (
         <Form {...form}>
@@ -43,7 +60,7 @@ function CreationForm({formName, type, hasIconSelect, onSubmit, isPending, isEdi
                                 {formName} name <span className="text-primary">*</span>
                             </FormLabel>
                             <FormControl>
-                                <FormInput className="mt-[12px] placeholder-[#393939]"
+                                <FormInput className="mt-[12px] placeholder-inactive"
                                            placeholder={`Name your ${type} here`} {...field} />
                             </FormControl>
                             <FormMessage className="mt-2 text-base font-semibold"/>
@@ -59,7 +76,7 @@ function CreationForm({formName, type, hasIconSelect, onSubmit, isPending, isEdi
                                 Description
                             </FormLabel>
                             <FormControl>
-                                <FormInput className="mt-[12px] placeholder-[#393939]"
+                                <FormInput className="mt-[12px] placeholder-inactive"
                                            placeholder={`Describe your ${type} here`} {...field} />
                             </FormControl>
                         </FormItem>
@@ -93,6 +110,42 @@ function CreationForm({formName, type, hasIconSelect, onSubmit, isPending, isEdi
                                     </span>
                                     <Image className="w-full h-full" src={border} alt="Select"/>
                                 </div>
+                            </FormItem>
+                        )}
+                    />
+                )}
+                {type === "bunch" && (
+                    <div className="flex items-center gap-2">
+                        <Checkbox id="checkbox" checked={showSelect} onCheckedChange={handleCheckbox}/>
+                        <Label htmlFor="checkbox">For language learning?</Label>
+                    </div>
+                )}
+                {showSelect && (
+                    <FormField
+                        control={form?.control}
+                        name="language"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select language"/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent onCloseAutoFocus={e => e.preventDefault()}>
+                                            <SelectItem value="m@example.com">m@example.com</SelectItem>
+                                            <SelectItem value="m@google.com">m@google.com</SelectItem>
+                                            <SelectItem value="m@support.com">m@support.com</SelectItem>
+                                            <SelectItem value="m@exasmple.com">m@exasmple.com</SelectItem>
+                                            <SelectItem value="m@goosgle.com">m@goosgle.com</SelectItem>
+                                            <SelectItem value="m@suspport.com">m@suspport.com</SelectItem>
+                                            <SelectItem value="m@exsample.com">m@exsample.com</SelectItem>
+                                            <SelectItem value="m@googsle.com">m@googsle.com</SelectItem>
+                                            <SelectItem value="m@supsport.com">m@supsport.com</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
                             </FormItem>
                         )}
                     />
