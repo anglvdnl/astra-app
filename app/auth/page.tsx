@@ -22,7 +22,7 @@ function Auth() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center h-[calc(100vh-36px)] relative">
+        <div className="flex flex-col justify-center items-center h-[calc(100vh-36px)] relative mt-[-24px]">
             <Image className="absolute left-9 top-0" src={logo} alt={"Logo"} width={180}/>
             {isActiveLogin && <Login toggleLayout={() => toggleLayout(LayoutType.register)}/>}
             {isActiveRegister && <Register toggleLayout={() => toggleLayout(LayoutType.login)}/>}
